@@ -6,7 +6,7 @@
 <title>Test de Control Digital · Fullscreen Split</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=Poppins:wght@300;600&family=Open+Sans:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Poppins:wght@300;400&family=Open+Sans:wght@700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#F6F8FB;
@@ -17,12 +17,6 @@
     --muted:#94A3B8;
     --brand:#2563EB;
     --red-gradient:linear-gradient(90deg,#FF5A3D 0%,#FF3F5F 55%,#FF1F49 100%);
-    --green:#059669;
-    --green-soft:#D1FAE5;
-    --amber:#D97706;
-    --amber-soft:#FEF3C7;
-    --red:#DC2626;
-    --red-soft:#FEE2E2;
     --font:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",Helvetica,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -152,7 +146,7 @@
     background:#fff;
     border:1px solid var(--line);
     border-radius:24px;
-    padding:26px 24px;
+    padding:22px 20px;
     box-shadow:0 10px 30px rgba(15,23,42,.05);
     overflow:auto;
     max-height:calc(100vh - 60px);
@@ -216,105 +210,124 @@
 
   .result{display:none}
   .result.show{display:block}
-  .risk-chip{
-    display:inline-flex;
+
+  .result-header{
+    display:flex;
     align-items:center;
-    gap:8px;
-    border-radius:999px;
-    padding:7px 11px;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .result-label{
     font-size:11px;
     font-weight:900;
-    margin-bottom:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--brand);
   }
-  .good{background:var(--green-soft);color:var(--green)}
-  .warn{background:var(--amber-soft);color:var(--amber)}
-  .bad{background:var(--red-soft);color:var(--red)}
-
-  .score{
-    font-size:clamp(44px,4vw,64px);
-    line-height:1;
-    letter-spacing:-.07em;
-    font-weight:900;
-    margin-bottom:10px;
-  }
-  .result h2{
-    font-size:clamp(22px,2vw,30px);
-    line-height:1.12;
-    letter-spacing:-.05em;
-    margin-bottom:12px;
-  }
-  .result p{
-    font-size:14px;
-    color:var(--text2);
-    line-height:1.6;
-  }
-  .findings{
-    margin-top:18px;
-    display:grid;
-    grid-template-columns:1fr;
-    gap:10px;
-  }
-  .finding{
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:13px 14px;
-    background:#fff;
-    color:var(--text2);
-    font-size:13px;
-    line-height:1.5;
-  }
-  .finding strong{color:var(--text)}
-  .cta{
-    margin-top:18px;
-    padding-top:16px;
-    border-top:1px solid var(--line);
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    align-items:flex-start;
-  }
-  .cta-title{
-    font-size:15px;
-    font-weight:900;
-    margin-bottom:4px;
-  }
-  .cta-text{
-    font-size:13px;
-    color:var(--text2);
-    line-height:1.5;
-    max-width:300px;
-  }
-  .wa{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    text-decoration:none;
-    background:#25D366;
-    color:#fff;
-    border-radius:14px;
-    padding:12px 15px;
-    font-size:13px;
-    font-weight:900;
-    white-space:nowrap;
-  }
-
-  .share-block{
-    width:100%;
-    margin-top:14px;
-    padding-top:14px;
-    border-top:1px dashed var(--line);
-  }
-  .share-label{
-    font-size:12px;
+  .result-count{
+    font-size:11px;
     font-weight:800;
-    color:var(--text2);
-    margin-bottom:10px;
-    letter-spacing:.02em;
+    color:var(--muted);
   }
-  .share-buttons{
+
+  .slider{
+    position:relative;
+    width:100%;
+    aspect-ratio:9/16;
+    border-radius:18px;
+    overflow:hidden;
+    background:#F1F5F9;
+  }
+  .slider-track{
+    display:flex;
+    width:100%;
+    height:100%;
+    transition:transform .35s cubic-bezier(.2,.8,.2,1);
+  }
+  .slide{
+    flex:0 0 100%;
+    width:100%;
+    height:100%;
+    position:relative;
+  }
+  .slide img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    transition:opacity .25s ease;
+  }
+  .slide.loading img{opacity:0}
+  .slide-skeleton{
+    position:absolute;inset:0;
+    background:linear-gradient(135deg,#FF5A3D 0%,#FF3F5F 55%,#FF1F49 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:rgba(255,255,255,.9);
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    opacity:1;
+    transition:opacity .25s ease;
+  }
+  .slide:not(.loading) .slide-skeleton{opacity:0;pointer-events:none}
+
+  .slider-arrow{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:rgba(15,23,42,.55);
+    color:#fff;
+    border:none;
+    font-size:22px;
+    font-weight:900;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:2;
+    transition:background .15s ease,opacity .2s ease;
+    padding:0;
+  }
+  .slider-arrow:hover{background:rgba(15,23,42,.78)}
+  .slider-arrow.prev{left:10px}
+  .slider-arrow.next{right:10px}
+  .slider-arrow[disabled]{opacity:.25;cursor:default}
+
+  .slider-dots{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin:12px 0 14px;
+  }
+  .slider-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--line);
+    border:none;
+    cursor:pointer;
+    padding:0;
+    transition:.2s ease;
+  }
+  .slider-dot.active{
+    background:#FF3F5F;
+    width:22px;
+    border-radius:999px;
+  }
+
+  .share-actions{
     display:flex;
     flex-direction:column;
     gap:8px;
+    margin-bottom:12px;
   }
   .share-btn{
     display:inline-flex;
@@ -337,21 +350,27 @@
     border-color:transparent;
     transform:translateY(-1px);
   }
-  .share-btn[disabled]{
-    opacity:.6;
-    cursor:wait;
+  .share-btn.ghost{
+    background:transparent;
+    color:var(--text2);
+    font-weight:800;
   }
-  .share-preview{
-    margin-top:10px;
-    width:100%;
-    aspect-ratio:9/16;
-    background:#F1F5F9;
+  .share-btn[disabled]{opacity:.6;cursor:wait}
+
+  .wa{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    text-decoration:none;
+    background:#25D366;
+    color:#fff;
     border-radius:14px;
-    overflow:hidden;
-    display:none;
+    padding:12px 15px;
+    font-size:13px;
+    font-weight:900;
+    white-space:nowrap;
   }
-  .share-preview.show{display:block}
-  .share-preview img{width:100%;height:100%;object-fit:contain;display:block}
 
   @media(max-width:900px){
     body{overflow:auto}
@@ -368,7 +387,7 @@
     .panel{
       max-height:none;
       border-radius:20px;
-      padding:22px 18px;
+      padding:20px 16px;
     }
     .copy h1{
       font-size:clamp(30px,10vw,42px);
@@ -381,7 +400,7 @@
     .bottom-meta{
       margin-top:22px;
     }
-    .q-title,.result h2{
+    .q-title{
       font-size:clamp(24px,7vw,30px);
     }
   }
@@ -416,31 +435,29 @@
         </div>
 
         <div class="result" id="resultView">
-          <div class="risk-chip" id="riskChip">Resultado</div>
-          <div class="score" id="score">0%</div>
-          <h2 id="resultTitle"></h2>
-          <p id="resultText"></p>
-          <div class="findings" id="findings"></div>
-
-          <div class="cta">
-            <div>
-              <div class="cta-title">¿Necesitas centralizar tus cuentas o crear tus campañas con orden real?</div>
-              <div class="cta-text">Si quieres poner bajo control tus activos, ordenar accesos o salir del “eso estaba en otro correo”, escríbenos.</div>
-            </div>
-            <a class="wa" target="_blank" rel="noopener"
-               href="https://wa.me/51937409733?text=Hola%2C%20quiero%20ayuda%20para%20centralizar%20mis%20cuentas%20y%20ordenar%20mis%20activos%20digitales.">
-              Hablar por WhatsApp
-            </a>
-
-            <div class="share-block">
-              <div class="share-label">Comparte tu resultado</div>
-              <div class="share-buttons">
-                <button class="share-btn" id="btnShare" type="button">Compartir en tu Story</button>
-                <button class="share-btn" id="btnDownload" type="button">Descargar imagen (1080×1920)</button>
-              </div>
-              <div class="share-preview" id="sharePreview"><img id="sharePreviewImg" alt="Vista previa del Story" /></div>
-            </div>
+          <div class="result-header">
+            <div class="result-label">Tu resultado</div>
+            <div class="result-count"><span id="slideCount">1 / 4</span></div>
           </div>
+
+          <div class="slider" id="sliderStage">
+            <button class="slider-arrow prev" id="prevSlide" type="button" aria-label="Anterior">‹</button>
+            <div class="slider-track" id="sliderTrack"></div>
+            <button class="slider-arrow next" id="nextSlide" type="button" aria-label="Siguiente">›</button>
+          </div>
+
+          <div class="slider-dots" id="sliderDots"></div>
+
+          <div class="share-actions">
+            <button class="share-btn" id="btnShareCurrent" type="button">Compartir en tu Story</button>
+            <button class="share-btn" id="btnDownloadCurrent" type="button">Descargar esta imagen</button>
+            <button class="share-btn ghost" id="btnDownloadAll" type="button">Descargar las 4 imágenes</button>
+          </div>
+
+          <a class="wa" target="_blank" rel="noopener"
+             href="https://wa.me/51937409733?text=Hola%2C%20quiero%20ayuda%20para%20centralizar%20mis%20cuentas%20y%20ordenar%20mis%20activos%20digitales.">
+            Hablar por WhatsApp
+          </a>
         </div>
       </div>
     </section>
@@ -606,6 +623,8 @@ function renderQuestion(id){
   });
 }
 
+let resultData = {};
+
 function showResult(){
   document.getElementById("questionView").style.display = "none";
   document.getElementById("resultView").classList.add("show");
@@ -616,58 +635,53 @@ function showResult(){
   const pct = maxVisited ? Math.round((totalScore / maxVisited) * 100) : 0;
 
   let chipClass = "good";
-  let chipText = "Control alto";
-  let title = "Tu empresa sí tiene bastante control sobre sus activos digitales.";
-  let text = "No parece que estés operando solo con esperanza y buena memoria. Tienes una base bastante sólida para no depender de terceros en lo más crítico.";
+  let chipText  = "CONTROL ALTO";
+  let title     = "Tu empresa sí tiene bastante control sobre sus activos digitales.";
+  let text      = "No parece que estés operando solo con esperanza y buena memoria. Tienes una base bastante sólida para no depender de terceros en lo más crítico.";
 
   if(pct < 80 && pct >= 60){
     chipClass = "warn";
-    chipText = "Control parcial";
-    title = "Tienes control… pero todavía con zonas medio prestadas.";
-    text = "Hay cosas importantes bajo tu control, sí. Pero todavía existen accesos o activos que dependen demasiado de terceros. Operas bien, hasta que alguien no responde.";
+    chipText  = "CONTROL PARCIAL";
+    title     = "Tienes control… pero todavía con zonas medio prestadas.";
+    text      = "Hay cosas importantes bajo tu control, sí. Pero todavía existen accesos o activos que dependen demasiado de terceros. Operas bien, hasta que alguien no responde.";
   } else if(pct < 60 && pct >= 40){
     chipClass = "warn";
-    chipText = "Riesgo alto";
-    title = "Tu estructura digital está más frágil de lo que parece.";
-    text = "Aquí ya hay dependencia real de terceros o demasiadas dudas sobre quién controla qué. No es caos total, pero sí un escenario donde perder acceso sería bastante fácil.";
+    chipText  = "RIESGO ALTO";
+    title     = "Tu estructura digital está más frágil de lo que parece.";
+    text      = "Aquí ya hay dependencia real de terceros o demasiadas dudas sobre quién controla qué. No es caos total, pero sí un escenario donde perder acceso sería bastante fácil.";
   } else if(pct < 40){
     chipClass = "bad";
-    chipText = "Peligro crítico";
-    title = "Tus activos digitales están corriendo más riesgo del que deberían.";
-    text = "Hoy tu empresa depende demasiado de accesos dispersos, terceros o vacíos de control. No es dramatismo: si algo pasa, recuperar todo puede ser lento, caro o simplemente imposible.";
+    chipText  = "PELIGRO CRÍTICO";
+    title     = "Tus activos digitales están corriendo más riesgo del que deberían.";
+    text      = "Hoy tu empresa depende demasiado de accesos dispersos, terceros o vacíos de control. No es dramatismo: si algo pasa, recuperar todo puede ser lento, caro o simplemente imposible.";
   }
-
-  const chip = document.getElementById("riskChip");
-  chip.className = "risk-chip " + chipClass;
-  chip.textContent = chipText;
-  document.getElementById("score").textContent = pct + "%";
-  document.getElementById("resultTitle").textContent = title;
-  document.getElementById("resultText").textContent = text;
 
   const findings = [];
   const answers = path.map(p => p.answer.toLowerCase());
 
-  if(answers.some(a => a === "no" || a.includes("no"))){
-    findings.push("<div class='finding'><strong>Hay activos fuera de tu control directo.</strong> Eso sí aumenta el riesgo operativo.</div>");
+  if(answers.some(a => a === "no" || a === "no sé")){
+    findings.push("Hay activos fuera de tu control directo. Eso aumenta el riesgo operativo.");
   }
   if(answers.some(a => a.includes("no estoy seguro")) || answers.some(a => a.includes("tal vez"))){
-    findings.push("<div class='finding'><strong>Hay demasiada incertidumbre.</strong> Cuando tu empresa no sabe quién controla qué, ya existe vulnerabilidad.</div>");
+    findings.push("Hay demasiada incertidumbre. Cuando no sabes quién controla qué, ya existe vulnerabilidad.");
   }
   if(answers.some(a => a.includes("parcial")) || answers.some(a => a.includes("a medias")) || answers.some(a => a.includes("solo uno"))){
-    findings.push("<div class='finding'><strong>Tienes accesos incompletos.</strong> Ver algo no es lo mismo que administrarlo.</div>");
+    findings.push("Tienes accesos incompletos. Ver algo no es lo mismo que administrarlo.");
   }
   if(answers.filter(a => a.includes("sí")).length >= 4){
-    findings.push("<div class='finding'><strong>Tienes una base rescatable.</strong> Hay piezas importantes que sí parecen estar bien controladas.</div>");
+    findings.push("Tienes una base rescatable. Varias piezas importantes sí están bien controladas.");
   }
   if(findings.length === 0){
-    findings.push("<div class='finding'><strong>No salió una alerta dominante.</strong> Igual conviene revisar la estructura completa.</div>");
+    findings.push("No salió una alerta dominante. Igual conviene revisar la estructura completa.");
   }
 
-  document.getElementById("findings").innerHTML = findings.slice(0,4).join("");
+  resultData = { pct, chipClass, chipText, titleText:title, text, findings };
 
-  wireShareButtons();
+  mountSlider();
+  renderAllSlides();
 }
 
+/* ===== Canvas helpers ===== */
 function roundRect(ctx, x, y, w, h, r){
   const radius = Math.min(r, w/2, h/2);
   ctx.beginPath();
@@ -684,7 +698,7 @@ function roundRect(ctx, x, y, w, h, r){
 }
 
 function wrapLines(ctx, text, maxWidth, maxLines){
-  const words = text.split(/\s+/);
+  const words = (text || "").split(/\s+/).filter(Boolean);
   const lines = [];
   let current = "";
   for(const w of words){
@@ -700,109 +714,58 @@ function wrapLines(ctx, text, maxWidth, maxLines){
   if(current && lines.length < maxLines) lines.push(current);
   if(lines.length === maxLines){
     let last = lines[maxLines - 1];
-    while(ctx.measureText(last + "…").width > maxWidth && last.length > 0){
-      last = last.slice(0, -1);
+    const totalUsed = lines.join(" ").split(/\s+/).length;
+    if(words.length > totalUsed){
+      while(ctx.measureText(last + "…").width > maxWidth && last.length > 0){
+        last = last.slice(0, -1);
+      }
+      lines[maxLines - 1] = last.trim() + "…";
     }
-    lines[maxLines - 1] = last.trim() + (words.length > lines.join(" ").split(/\s+/).length ? "…" : "");
   }
   return lines;
 }
 
-async function renderStoryCanvas(){
-  if(document.fonts && document.fonts.ready){
-    try { await document.fonts.ready; } catch(e){}
-  }
-
-  const W = 1080, H = 1920;
-  const canvas = document.createElement("canvas");
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext("2d");
-
+function drawBackground(ctx, W, H){
   const grad = ctx.createLinearGradient(0, 0, W, H);
   grad.addColorStop(0,    "#FF5A3D");
   grad.addColorStop(0.55, "#FF3F5F");
   grad.addColorStop(1,    "#FF1F49");
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
+}
 
-  const pct = parseInt(document.getElementById("score").textContent, 10) || 0;
-  const chipEl = document.getElementById("riskChip");
-  const chipText = chipEl.textContent.trim();
-  const chipClass = chipEl.classList.contains("good") ? "good"
-                  : chipEl.classList.contains("bad")  ? "bad"
-                  : "warn";
-  const titleText = document.getElementById("resultTitle").textContent.trim();
-
+function drawHeader(ctx, W){
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.fillStyle = "rgba(255,255,255,0.92)";
   ctx.font = '800 28px "Montserrat", sans-serif';
   ctx.fillText("AGENCIA LIMA RETAIL", W/2, 110);
-
   ctx.fillStyle = "rgba(255,255,255,0.78)";
   ctx.font = '400 26.6px "Poppins", sans-serif';
   ctx.fillText("Test de Control Digital", W/2, 154);
-
   ctx.strokeStyle = "rgba(255,255,255,0.22)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(140, 210);
   ctx.lineTo(W - 140, 210);
   ctx.stroke();
+}
 
-  const chipColors = {
-    good: { bg: "#FFFFFF", text: "#059669", label: "CONTROL ALTO" },
-    warn: { bg: "#FFFFFF", text: "#B45309", label: chipText.toUpperCase() },
-    bad:  { bg: "#FFFFFF", text: "#B91C1C", label: "PELIGRO CRÍTICO" }
-  };
-  const c = chipColors[chipClass];
-  const chipLabel = (chipClass === "warn") ? chipText.toUpperCase() : c.label;
-
-  ctx.font = '800 38px "Montserrat", sans-serif';
-  const chipTextW = ctx.measureText(chipLabel).width;
-  const chipPad = 46;
-  const chipH = 96;
-  const chipW = chipTextW + chipPad * 2;
-  const chipX = (W - chipW) / 2;
-  const chipY = 300;
-
-  ctx.fillStyle = c.bg;
-  roundRect(ctx, chipX, chipY, chipW, chipH, chipH/2);
-  ctx.fill();
-
-  ctx.fillStyle = c.text;
-  ctx.textBaseline = "middle";
-  ctx.fillText(chipLabel, W/2, chipY + chipH/2 + 2);
-
-  ctx.textBaseline = "top";
-  ctx.fillStyle = "#FFFFFF";
-  ctx.font = '900 280px "Montserrat", sans-serif';
-  ctx.fillText(pct + "%", W/2, 460);
-
-  ctx.fillStyle = "#FFFFFF";
-  ctx.font = '800 68px "Montserrat", sans-serif';
-  const lines = wrapLines(ctx, titleText, W - 200, 5);
-  const lineH = 82;
-  const titleStartY = 860;
-  lines.forEach((line, i) => {
-    ctx.fillText(line, W/2, titleStartY + i * lineH);
-  });
-
+function drawFooter(ctx, W){
   ctx.strokeStyle = "rgba(255,255,255,0.22)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(140, 1520);
   ctx.lineTo(W - 140, 1520);
   ctx.stroke();
-
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
   ctx.fillStyle = "rgba(255,255,255,0.88)";
   ctx.font = '800 28px "Montserrat", sans-serif';
   ctx.fillText("HAZ EL TEST TÚ TAMBIÉN", W/2, 1580);
-
   ctx.fillStyle = "#FFFFFF";
   ctx.font = '300 44px "Poppins", sans-serif';
   ctx.fillText("www.limaretail.com", W/2, 1628);
-
   const btnW = 460, btnH = 108, btnR = 22;
   const btnX = (W - btnW)/2, btnY = 1720;
   ctx.fillStyle = "#518fec";
@@ -812,7 +775,157 @@ async function renderStoryCanvas(){
   ctx.font = '700 36px "Open Sans", sans-serif';
   ctx.textBaseline = "middle";
   ctx.fillText("HACER EL TEST  →", W/2, btnY + btnH/2 + 2);
+}
 
+function chipTextColor(chipClass){
+  if(chipClass === "good") return "#059669";
+  if(chipClass === "bad")  return "#B91C1C";
+  return "#B45309";
+}
+
+/* ===== Individual slide drawers ===== */
+function drawSlideScore(ctx, W, H, data){
+  ctx.font = '800 38px "Montserrat", sans-serif';
+  const chipLabel = (data.chipText || "").toUpperCase();
+  const chipTextW = ctx.measureText(chipLabel).width;
+  const chipPad = 46;
+  const chipH = 96;
+  const chipW = chipTextW + chipPad * 2;
+  const chipX = (W - chipW) / 2;
+  const chipY = 300;
+  ctx.fillStyle = "#FFFFFF";
+  roundRect(ctx, chipX, chipY, chipW, chipH, chipH/2);
+  ctx.fill();
+  ctx.fillStyle = chipTextColor(data.chipClass);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(chipLabel, W/2, chipY + chipH/2 + 2);
+
+  ctx.textBaseline = "top";
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = '900 280px "Montserrat", sans-serif';
+  ctx.fillText(data.pct + "%", W/2, 460);
+
+  ctx.font = '800 68px "Montserrat", sans-serif';
+  const lines = wrapLines(ctx, data.titleText, W - 180, 5);
+  const lineH = 82;
+  const startY = 860;
+  lines.forEach((line, i) => ctx.fillText(line, W/2, startY + i * lineH));
+}
+
+function drawSlideDiagnosis(ctx, W, H, data){
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  ctx.font = '900 32px "Montserrat", sans-serif';
+  ctx.fillText("¿QUÉ SIGNIFICA?", W/2, 300);
+
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = '900 60px "Montserrat", sans-serif';
+  const titleLines = wrapLines(ctx, data.titleText, W - 180, 4);
+  const titleLineH = 74;
+  const titleStart = 400;
+  titleLines.forEach((l, i) => ctx.fillText(l, W/2, titleStart + i * titleLineH));
+
+  const bodyStart = titleStart + titleLines.length * titleLineH + 70;
+  ctx.fillStyle = "rgba(255,255,255,0.96)";
+  ctx.font = '400 40px "Poppins", sans-serif';
+  const bodyLines = wrapLines(ctx, data.text, W - 180, 14);
+  const bodyLineH = 56;
+  bodyLines.forEach((l, i) => ctx.fillText(l, W/2, bodyStart + i * bodyLineH));
+}
+
+function drawSlideFindings(ctx, W, H, data){
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  ctx.font = '900 32px "Montserrat", sans-serif';
+  ctx.fillText("QUÉ ENCONTRAMOS", W/2, 300);
+
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = '900 60px "Montserrat", sans-serif';
+  ctx.fillText("En tu diagnóstico:", W/2, 380);
+
+  const items = (data.findings || []).slice(0, 4);
+  let y = 520;
+  const numSize = 72;
+  const numLeft = 110;
+  const textLeft = numLeft + numSize + 30;
+  const maxTextW = W - textLeft - 80;
+
+  items.forEach((f, i) => {
+    ctx.fillStyle = "#FFFFFF";
+    ctx.beginPath();
+    ctx.arc(numLeft + numSize/2, y + numSize/2, numSize/2, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = "#FF3F5F";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = '900 42px "Montserrat", sans-serif';
+    ctx.fillText((i+1).toString(), numLeft + numSize/2, y + numSize/2 + 3);
+
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = '700 38px "Montserrat", sans-serif';
+    const lines = wrapLines(ctx, f, maxTextW, 3);
+    const lineH = 50;
+    lines.forEach((l, li) => ctx.fillText(l, textLeft, y + li * lineH + 2));
+    y += Math.max(numSize + 42, lines.length * lineH + 42);
+  });
+}
+
+function drawSlideCTA(ctx, W, H){
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  ctx.font = '900 32px "Montserrat", sans-serif';
+  ctx.fillText("SIGUIENTE PASO", W/2, 300);
+
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = '900 72px "Montserrat", sans-serif';
+  const hLines = wrapLines(ctx, "Pon tu negocio digital bajo control.", W - 140, 4);
+  const hLineH = 86;
+  hLines.forEach((l, i) => ctx.fillText(l, W/2, 410 + i * hLineH));
+
+  const bodyY = 410 + hLines.length * hLineH + 50;
+  ctx.fillStyle = "rgba(255,255,255,0.94)";
+  ctx.font = '400 40px "Poppins", sans-serif';
+  const bLines = wrapLines(ctx, "Te ayudamos a centralizar accesos, ordenar campañas y salir del famoso “eso lo veía otra persona”.", W - 160, 7);
+  const bLineH = 56;
+  bLines.forEach((l, i) => ctx.fillText(l, W/2, bodyY + i * bLineH));
+
+  const pillW = 760, pillH = 140, pillY = 1300;
+  const pillX = (W - pillW)/2;
+  ctx.fillStyle = "#25D366";
+  roundRect(ctx, pillX, pillY, pillW, pillH, pillH/2);
+  ctx.fill();
+  ctx.fillStyle = "#FFFFFF";
+  ctx.textBaseline = "middle";
+  ctx.font = '900 38px "Montserrat", sans-serif';
+  ctx.fillText("WHATSAPP  +51 937 409 733", W/2, pillY + pillH/2 + 3);
+}
+
+const SLIDE_TYPES = ['score','diagnosis','findings','cta'];
+let slideBlobs = [null,null,null,null];
+let slideUrls  = [null,null,null,null];
+let currentSlide = 0;
+
+async function renderSlideCanvas(type){
+  const W = 1080, H = 1920;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  drawBackground(ctx, W, H);
+  drawHeader(ctx, W);
+  if(type === 'score')     drawSlideScore(ctx, W, H, resultData);
+  if(type === 'diagnosis') drawSlideDiagnosis(ctx, W, H, resultData);
+  if(type === 'findings')  drawSlideFindings(ctx, W, H, resultData);
+  if(type === 'cta')       drawSlideCTA(ctx, W, H, resultData);
+  drawFooter(ctx, W);
   return canvas;
 }
 
@@ -820,51 +933,134 @@ function canvasToBlob(canvas){
   return new Promise(resolve => canvas.toBlob(resolve, "image/png", 0.95));
 }
 
-let cachedStoryBlob = null;
-let cachedStoryUrl  = null;
-
-async function buildAndPreview(){
-  const canvas = await renderStoryCanvas();
-  const blob = await canvasToBlob(canvas);
-  cachedStoryBlob = blob;
-  if(cachedStoryUrl) URL.revokeObjectURL(cachedStoryUrl);
-  cachedStoryUrl = URL.createObjectURL(blob);
-  const previewEl = document.getElementById("sharePreview");
-  const imgEl = document.getElementById("sharePreviewImg");
-  imgEl.src = cachedStoryUrl;
-  previewEl.classList.add("show");
-  return blob;
-}
-
-async function handleDownload(){
-  const btn = document.getElementById("btnDownload");
-  btn.disabled = true; btn.textContent = "Generando imagen…";
-  try {
-    const blob = cachedStoryBlob || await buildAndPreview();
-    const pct = parseInt(document.getElementById("score").textContent, 10) || 0;
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "lima-retail-test-control-" + pct + ".png";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  } catch(e){
-    alert("No se pudo generar la imagen: " + (e && e.message ? e.message : e));
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Descargar imagen (1080×1920)";
+async function renderAllSlides(){
+  if(document.fonts && document.fonts.ready){
+    try { await document.fonts.ready; } catch(e){}
+  }
+  for(let i = 0; i < SLIDE_TYPES.length; i++){
+    try {
+      const canvas = await renderSlideCanvas(SLIDE_TYPES[i]);
+      const blob = await canvasToBlob(canvas);
+      slideBlobs[i] = blob;
+      if(slideUrls[i]) URL.revokeObjectURL(slideUrls[i]);
+      slideUrls[i] = URL.createObjectURL(blob);
+      const img  = document.getElementById("slide-img-" + i);
+      const wrap = document.getElementById("slide-wrap-" + i);
+      if(img)  img.src = slideUrls[i];
+      if(wrap) wrap.classList.remove("loading");
+    } catch(e){
+      console.error("slide render error", i, e);
+    }
   }
 }
 
-async function handleShare(){
-  const btn = document.getElementById("btnShare");
-  btn.disabled = true; btn.textContent = "Preparando…";
+function mountSlider(){
+  const track = document.getElementById("sliderTrack");
+  track.innerHTML = "";
+  SLIDE_TYPES.forEach((t, i) => {
+    const slide = document.createElement("div");
+    slide.className = "slide loading";
+    slide.id = "slide-wrap-" + i;
+    slide.innerHTML =
+      '<div class="slide-skeleton">Generando imagen…</div>' +
+      '<img id="slide-img-' + i + '" alt="Story ' + (i+1) + '" />';
+    track.appendChild(slide);
+  });
+  const dotsEl = document.getElementById("sliderDots");
+  dotsEl.innerHTML = "";
+  SLIDE_TYPES.forEach((t, i) => {
+    const d = document.createElement("button");
+    d.className = "slider-dot" + (i === 0 ? " active" : "");
+    d.type = "button";
+    d.setAttribute("aria-label", "Ir al story " + (i+1));
+    d.onclick = () => goToSlide(i);
+    dotsEl.appendChild(d);
+  });
+  document.getElementById("prevSlide").onclick = () => goToSlide(currentSlide - 1);
+  document.getElementById("nextSlide").onclick = () => goToSlide(currentSlide + 1);
+
+  const stage = document.getElementById("sliderStage");
+  let startX = null, startY = null;
+  stage.addEventListener("touchstart", e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, {passive:true});
+  stage.addEventListener("touchend", e => {
+    if(startX == null) return;
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const dx = endX - startX;
+    const dy = endY - startY;
+    if(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)){
+      goToSlide(currentSlide + (dx < 0 ? 1 : -1));
+    }
+    startX = null; startY = null;
+  });
+
+  document.addEventListener("keydown", e => {
+    if(!document.getElementById("resultView").classList.contains("show")) return;
+    if(e.key === "ArrowLeft")  goToSlide(currentSlide - 1);
+    if(e.key === "ArrowRight") goToSlide(currentSlide + 1);
+  });
+
+  document.getElementById("btnShareCurrent").onclick    = handleShareCurrent;
+  document.getElementById("btnDownloadCurrent").onclick = handleDownloadCurrent;
+  document.getElementById("btnDownloadAll").onclick     = handleDownloadAll;
+
+  goToSlide(0);
+}
+
+function goToSlide(i){
+  const total = SLIDE_TYPES.length;
+  currentSlide = Math.max(0, Math.min(total - 1, i));
+  document.getElementById("sliderTrack").style.transform =
+    "translateX(-" + (currentSlide * 100) + "%)";
+  document.querySelectorAll(".slider-dot").forEach((d, idx) => {
+    d.classList.toggle("active", idx === currentSlide);
+  });
+  document.getElementById("prevSlide").disabled = currentSlide === 0;
+  document.getElementById("nextSlide").disabled = currentSlide === total - 1;
+  document.getElementById("slideCount").textContent = (currentSlide + 1) + " / " + total;
+}
+
+function downloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+async function handleDownloadCurrent(){
+  const btn = document.getElementById("btnDownloadCurrent");
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = "Descargando…";
   try {
-    const blob = cachedStoryBlob || await buildAndPreview();
-    const pct = parseInt(document.getElementById("score").textContent, 10) || 0;
-    const chipText = document.getElementById("riskChip").textContent.trim();
-    const file = new File([blob], "lima-retail-test-control-" + pct + ".png", { type: "image/png" });
+    const blob = slideBlobs[currentSlide];
+    if(!blob){ alert("La imagen aún se está generando. Espera un momento."); return; }
+    const pct = resultData.pct || 0;
+    downloadBlob(blob, `lima-retail-test-${pct}-story-${currentSlide+1}.png`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+}
+
+async function handleShareCurrent(){
+  const btn = document.getElementById("btnShareCurrent");
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = "Preparando…";
+  try {
+    const blob = slideBlobs[currentSlide];
+    if(!blob){ alert("La imagen aún se está generando. Espera un momento."); return; }
+    const pct = resultData.pct || 0;
+    const chipText = resultData.chipText || "";
+    const file = new File([blob], `lima-retail-test-${pct}-story-${currentSlide+1}.png`, { type: "image/png" });
     const shareData = {
       files: [file],
       title: "Test de Control Digital · Lima Retail",
@@ -873,24 +1069,35 @@ async function handleShare(){
     if(navigator.canShare && navigator.canShare(shareData)){
       await navigator.share(shareData);
     } else {
-      alert("Tu navegador no soporta compartir directo a Stories. Se va a descargar la imagen — súbela manualmente a tu Story.");
-      await handleDownload();
+      alert("Tu navegador no soporta compartir directo a Stories. Se descargará la imagen: súbela manualmente a tu Story.");
+      await handleDownloadCurrent();
     }
   } catch(e){
     if(e && e.name === "AbortError") return;
     alert("No se pudo compartir: " + (e && e.message ? e.message : e));
   } finally {
     btn.disabled = false;
-    btn.textContent = "Compartir en tu Story";
+    btn.textContent = original;
   }
 }
 
-function wireShareButtons(){
-  const dl = document.getElementById("btnDownload");
-  const sh = document.getElementById("btnShare");
-  if(dl && !dl.dataset.wired){ dl.addEventListener("click", handleDownload); dl.dataset.wired = "1"; }
-  if(sh && !sh.dataset.wired){ sh.addEventListener("click", handleShare);    sh.dataset.wired = "1"; }
-  buildAndPreview().catch(() => {});
+async function handleDownloadAll(){
+  const btn = document.getElementById("btnDownloadAll");
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = "Descargando…";
+  try {
+    const pct = resultData.pct || 0;
+    for(let i = 0; i < slideBlobs.length; i++){
+      const blob = slideBlobs[i];
+      if(!blob) continue;
+      downloadBlob(blob, `lima-retail-test-${pct}-story-${i+1}.png`);
+      await new Promise(r => setTimeout(r, 400));
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = original;
+  }
 }
 
 renderQuestion("q1");
