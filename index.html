@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Test de Control Digital · Fullscreen Split</title>
+<style>
+  :root{
+    --bg:#F6F8FB;
+    --card:#FFFFFF;
+    --line:#E2E8F0;
+    --text:#0F172A;
+    --text2:#475569;
+    --muted:#94A3B8;
+    --brand:#2563EB;
+    --red-gradient:linear-gradient(90deg,#FF5A3D 0%,#FF3F5F 55%,#FF1F49 100%);
+    --green:#059669;
+    --green-soft:#D1FAE5;
+    --amber:#D97706;
+    --amber-soft:#FEF3C7;
+    --red:#DC2626;
+    --red-soft:#FEE2E2;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",Helvetica,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--font);
+    background:var(--bg);
+    color:var(--text);
+    overflow:hidden;
+  }
+
+  .app{
+    min-height:100vh;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .topbar{
+    height:64px;
+    border-bottom:1px solid var(--line);
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(10px);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 20px;
+    flex-shrink:0;
+  }
+  .brand{
+    font-size:14px;
+    font-weight:800;
+    letter-spacing:-.01em;
+  }
+  .brand span{color:var(--text2);font-weight:700}
+  .topmeta{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:var(--text2);
+    font-size:12px;
+    font-weight:700;
+  }
+  .step-pill{
+    background:#EFF6FF;
+    color:#1D4ED8;
+    border:1px solid #BFDBFE;
+    border-radius:999px;
+    padding:7px 11px;
+  }
+
+  .main{
+    flex:1;
+    width:100%;
+    max-width:1040px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 380px;
+    gap:34px;
+    min-height:0;
+    height:calc(100vh - 64px);
+    padding:0 24px;
+  }
+
+  .left{
+    padding:28px 0 22px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .copy{
+    max-width:500px;
+    width:100%;
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    width:fit-content;
+    background:#EFF6FF;
+    color:#1D4ED8;
+    border:1px solid #BFDBFE;
+    border-radius:999px;
+    padding:7px 11px;
+    font-size:11px;
+    font-weight:800;
+    margin-bottom:16px;
+  }
+
+  .copy h1{
+    font-size:clamp(28px,3.5vw,46px);
+    line-height:1.03;
+    letter-spacing:-.06em;
+    max-width:540px;
+    margin-bottom:16px;
+  }
+  .copy p{
+    font-size:16px;
+    line-height:1.58;
+    color:var(--text2);
+    max-width:480px;
+  }
+
+  .bottom-meta{
+    max-width:500px;
+    width:100%;
+    margin-top:28px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+  }
+  .progress-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+  }
+  .progress-label{
+    font-size:12px;
+    font-weight:800;
+    color:var(--text2);
+  }
+  .progress-steps{
+    font-size:12px;
+    color:var(--muted);
+    font-weight:700;
+  }
+  .bar{
+    height:8px;
+    width:100%;
+    background:#E2E8F0;
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .bar > span{
+    display:block;
+    height:100%;
+    width:0%;
+    background:var(--red-gradient);
+    transition:width .25s ease;
+  }
+
+  .right{
+    padding:28px 0 22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .panel{
+    width:100%;
+    max-width:380px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:26px 24px;
+    box-shadow:0 10px 30px rgba(15,23,42,.05);
+    overflow:auto;
+    max-height:calc(100vh - 120px);
+  }
+
+  .q-tag{
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--brand);
+    margin-bottom:14px;
+  }
+  .q-title{
+    font-size:clamp(22px,2vw,30px);
+    line-height:1.1;
+    letter-spacing:-.05em;
+    margin-bottom:12px;
+  }
+  .q-sub{
+    font-size:14px;
+    color:var(--text2);
+    line-height:1.6;
+    margin-bottom:20px;
+    max-width:300px;
+  }
+
+  .options{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .opt{
+    width:100%;
+    border:1px solid transparent;
+    background:linear-gradient(#fff,#fff) padding-box,linear-gradient(var(--line),var(--line)) border-box;
+    border-radius:18px;
+    padding:15px 15px;
+    text-align:left;
+    cursor:pointer;
+    transition:.15s ease;
+  }
+  .opt:hover{
+    background:linear-gradient(#FFF8F7,#FFF8F7) padding-box,var(--red-gradient) border-box;
+    box-shadow:0 10px 24px rgba(255,63,95,.12);
+    transform:translateY(-1px);
+  }
+  .opt-title{
+    display:block;
+    font-size:16px;
+    font-weight:900;
+    letter-spacing:-.02em;
+    margin-bottom:4px;
+  }
+  .opt-sub{
+    display:block;
+    font-size:13px;
+    color:var(--text2);
+    line-height:1.45;
+  }
+
+  .result{display:none}
+  .result.show{display:block}
+  .risk-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border-radius:999px;
+    padding:7px 11px;
+    font-size:11px;
+    font-weight:900;
+    margin-bottom:12px;
+  }
+  .good{background:var(--green-soft);color:var(--green)}
+  .warn{background:var(--amber-soft);color:var(--amber)}
+  .bad{background:var(--red-soft);color:var(--red)}
+
+  .score{
+    font-size:clamp(44px,4vw,64px);
+    line-height:1;
+    letter-spacing:-.07em;
+    font-weight:900;
+    margin-bottom:10px;
+  }
+  .result h2{
+    font-size:clamp(22px,2vw,30px);
+    line-height:1.12;
+    letter-spacing:-.05em;
+    margin-bottom:12px;
+  }
+  .result p{
+    font-size:14px;
+    color:var(--text2);
+    line-height:1.6;
+  }
+  .findings{
+    margin-top:18px;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .finding{
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:13px 14px;
+    background:#fff;
+    color:var(--text2);
+    font-size:13px;
+    line-height:1.5;
+  }
+  .finding strong{color:var(--text)}
+  .cta{
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    align-items:flex-start;
+  }
+  .cta-title{
+    font-size:15px;
+    font-weight:900;
+    margin-bottom:4px;
+  }
+  .cta-text{
+    font-size:13px;
+    color:var(--text2);
+    line-height:1.5;
+    max-width:300px;
+  }
+  .wa{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    background:#25D366;
+    color:#fff;
+    border-radius:14px;
+    padding:12px 15px;
+    font-size:13px;
+    font-weight:900;
+    white-space:nowrap;
+  }
+
+  @media(max-width:900px){
+    body{overflow:auto}
+    .app{height:auto;min-height:100vh}
+    .main{
+      grid-template-columns:1fr;
+      gap:18px;
+      height:auto;
+      padding:0 16px 20px;
+      max-width:560px;
+    }
+    .left,.right{padding:18px 0 0}
+    .copy,.bottom-meta,.panel{max-width:none}
+    .panel{
+      max-height:none;
+      border-radius:20px;
+      padding:22px 18px;
+    }
+    .copy h1{
+      font-size:clamp(30px,10vw,42px);
+      max-width:none;
+    }
+    .copy p{
+      font-size:15px;
+      max-width:none;
+    }
+    .bottom-meta{
+      margin-top:22px;
+    }
+    .q-title,.result h2{
+      font-size:clamp(24px,7vw,30px);
+    }
+    .topbar{
+      height:58px;
+      padding:0 14px;
+    }
+    .brand{
+      font-size:13px;
+    }
+    .step-pill{
+      font-size:11px;
+      padding:6px 9px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">Lima Retail <span>· Test de control digital</span></div>
+    <div class="topmeta">
+      <div class="step-pill">Pregunta <span id="stepNow">1</span> / <span id="stepTotal">7</span></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <section class="left">
+      <div class="copy">
+        <div class="eyebrow">Diagnóstico rápido</div>
+        <h1>Descubre qué tanto control tienes sobre tu empresa en digital.</h1>
+        <p>Responde preguntas cortas. Según tu respuesta, la prueba avanza. Al final verás qué tanto riesgo corres de perder activos clave, depender de terceros o seguir operando con el famoso “eso lo veía otra persona”.</p>
+      </div>
+
+      <div class="bottom-meta">
+        <div class="progress-head">
+          <div class="progress-label">Avance del diagnóstico</div>
+          <div class="progress-steps"><span id="progressPct">0</span>% completado</div>
+        </div>
+        <div class="bar"><span id="barFill"></span></div>
+      </div>
+    </section>
+
+    <section class="right">
+      <div class="panel">
+        <div id="questionView">
+          <div class="q-tag" id="qTag"></div>
+          <div class="q-title" id="qTitle"></div>
+          <div class="q-sub" id="qSub"></div>
+          <div class="options" id="options"></div>
+        </div>
+
+        <div class="result" id="resultView">
+          <div class="risk-chip" id="riskChip">Resultado</div>
+          <div class="score" id="score">0%</div>
+          <h2 id="resultTitle"></h2>
+          <p id="resultText"></p>
+          <div class="findings" id="findings"></div>
+
+          <div class="cta">
+            <div>
+              <div class="cta-title">¿Necesitas centralizar tus cuentas o crear tus campañas con orden real?</div>
+              <div class="cta-text">Si quieres poner bajo control tus activos, ordenar accesos o salir del “eso estaba en otro correo”, escríbenos.</div>
+            </div>
+            <a class="wa" target="_blank" rel="noopener"
+               href="https://wa.me/51937409733?text=Hola%2C%20quiero%20ayuda%20para%20centralizar%20mis%20cuentas%20y%20ordenar%20mis%20activos%20digitales.">
+              Hablar por WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const questions = {
+  q1: {
+    tag: "Infraestructura",
+    title: "¿Tienes acceso a tu hosting?",
+    sub: "Sí, al lugar donde vive tu web. No al amigo que dice que él lo ve.",
+    options: [
+      {label:"Sí, acceso total", sub:"Usuario, clave y control directo.", score:15, next:"q2a"},
+      {label:"Más o menos", sub:"Tengo algo, pero no mando del todo.", score:7, next:"q2b"},
+      {label:"No", sub:"Eso lo tiene otra persona.", score:0, next:"q2b"}
+    ]
+  },
+  q2a: {
+    tag: "Propiedad",
+    title: "Bien. ¿Y el dominio también lo controlas tú?",
+    sub: "Porque tener la web sin controlar el dominio es como tener el local… alquilado por alguien más.",
+    options: [
+      {label:"Sí, también", sub:"Todo bajo control.", score:15, next:"q3a"},
+      {label:"No estoy seguro", sub:"Ya empezamos con la fe.", score:4, next:"q3b"},
+      {label:"No", sub:"El dominio vive en otro universo.", score:0, next:"q3b"}
+    ]
+  },
+  q2b: {
+    tag: "Propiedad",
+    title: "Ok. Entonces vayamos a lo siguiente: ¿controlas tu dominio?",
+    sub: "Si tampoco controlas esto, la web está jugando de visita.",
+    options: [
+      {label:"Sí", sub:"Al menos esto sí.", score:10, next:"q3b"},
+      {label:"No estoy seguro", sub:"Modo intuición activado.", score:3, next:"q3b"},
+      {label:"No", sub:"Todo muy espiritual hasta ahora.", score:0, next:"q3b"}
+    ]
+  },
+  q3a: {
+    tag: "Meta",
+    title: "Pasemos a Meta. ¿Tienes acceso a tu Business Manager?",
+    sub: "El de verdad. No solo entrar a Facebook y mirar la página.",
+    options: [
+      {label:"Sí, administrador", sub:"Aquí sí hay orden.", score:15, next:"q4a"},
+      {label:"Tengo acceso parcial", sub:"Entro, pero no gobierno.", score:7, next:"q4b"},
+      {label:"No", sub:"Otro clásico.", score:0, next:"q4b"}
+    ]
+  },
+  q3b: {
+    tag: "Meta",
+    title: "Ahora Meta: ¿tienes acceso a tu Business Manager?",
+    sub: "Porque muchas empresas creen que sí… hasta que quieren tocar algo serio.",
+    options: [
+      {label:"Sí, administrador", sub:"Perfecto.", score:15, next:"q4b"},
+      {label:"Tengo acceso parcial", sub:"Se puede mirar, poco más.", score:7, next:"q4b"},
+      {label:"No", sub:"Eso está peligroso.", score:0, next:"q4b"}
+    ]
+  },
+  q4a: {
+    tag: "Google",
+    title: "¿Y en Google? ¿Controlas Google Ads y Analytics?",
+    sub: "No preguntamos por cariño. Preguntamos por control real.",
+    options: [
+      {label:"Sí, ambos", sub:"Muy bien.", score:20, next:"q5a"},
+      {label:"Solo uno", sub:"Algo es algo.", score:10, next:"q5b"},
+      {label:"No", sub:"La data anda suelta.", score:0, next:"q5b"}
+    ]
+  },
+  q4b: {
+    tag: "Google",
+    title: "Vamos a Google: ¿tienes acceso a Ads y Analytics?",
+    sub: "Si no controlas medición ni campañas, operas con demasiada confianza.",
+    options: [
+      {label:"Sí, ambos", sub:"Eso suma bastante.", score:20, next:"q5b"},
+      {label:"Solo uno", sub:"Todavía falta.", score:10, next:"q5b"},
+      {label:"No", sub:"Ajá.", score:0, next:"q5b"}
+    ]
+  },
+  q5a: {
+    tag: "Continuidad",
+    title: "Última capa: si hoy tu proveedor desaparece, ¿puedes recuperar todo?",
+    sub: "Web, campañas, medición, cuentas, accesos. Todo.",
+    options: [
+      {label:"Sí, sin problema", sub:"Aquí sí hay empresa.", score:20, next:"q6"},
+      {label:"Tal vez", sub:"Esa palabra no da paz.", score:8, next:"q6"},
+      {label:"No", sub:"Ahí está el riesgo.", score:0, next:"q6"}
+    ]
+  },
+  q5b: {
+    tag: "Continuidad",
+    title: "Pregunta incómoda: si hoy tu proveedor desaparece, ¿puedes recuperar tus activos?",
+    sub: "Sí, ya sé. No suena bonito. Pero justo por eso se pregunta.",
+    options: [
+      {label:"Sí, sin problema", sub:"Todavía hay esperanza.", score:20, next:"q6"},
+      {label:"Tal vez", sub:"Dependes más de lo que crees.", score:8, next:"q6"},
+      {label:"No", sub:"Entonces no tienes control real.", score:0, next:"q6"}
+    ]
+  },
+  q6: {
+    tag: "Orden interno",
+    title: "¿Más de una persona de confianza tiene acceso administrativo?",
+    sub: "Porque ponerle todo el negocio a una sola persona no es estructura. Es fe.",
+    options: [
+      {label:"Sí", sub:"Buen respaldo.", score:10, next:"q7"},
+      {label:"Solo una", sub:"Muy frágil.", score:4, next:"q7"},
+      {label:"No sé", sub:"Otra vez la niebla.", score:0, next:"q7"}
+    ]
+  },
+  q7: {
+    tag: "Cierre",
+    title: "¿Tienes documentado quién controla qué?",
+    sub: "Usuarios, permisos, plataformas y responsables. Nada glamoroso, pero útil cuando hay problemas.",
+    options: [
+      {label:"Sí, ordenado", sub:"Esto sí es empresa.", score:15, next:null},
+      {label:"A medias", sub:"Algo hay.", score:6, next:null},
+      {label:"No", sub:"Todo vive en chats y recuerdos.", score:0, next:null}
+    ]
+  }
+};
+
+const path = [];
+let totalScore = 0;
+const totalSteps = 7;
+
+function updateProgress() {
+  const answered = path.length;
+  const pct = Math.round((answered / totalSteps) * 100);
+  document.getElementById("stepNow").textContent = Math.min(answered + 1, totalSteps);
+  document.getElementById("stepTotal").textContent = totalSteps;
+  document.getElementById("progressPct").textContent = pct;
+  document.getElementById("barFill").style.width = pct + "%";
+}
+
+function renderQuestion(id){
+  const q = questions[id];
+  updateProgress();
+
+  document.getElementById("qTag").textContent = q.tag;
+  document.getElementById("qTitle").textContent = q.title;
+  document.getElementById("qSub").textContent = q.sub;
+
+  const opts = document.getElementById("options");
+  opts.innerHTML = "";
+  const max = Math.max(...q.options.map(o => o.score));
+
+  q.options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "opt";
+    btn.innerHTML = `<span class="opt-title">${opt.label}</span><span class="opt-sub">${opt.sub}</span>`;
+    btn.onclick = () => {
+      path.push({
+        question:q.title,
+        answer:opt.label,
+        score:opt.score,
+        max:max
+      });
+      totalScore += opt.score;
+      if(opt.next){
+        renderQuestion(opt.next);
+      }else{
+        showResult();
+      }
+    };
+    opts.appendChild(btn);
+  });
+}
+
+function showResult(){
+  document.getElementById("questionView").style.display = "none";
+  document.getElementById("resultView").classList.add("show");
+  document.getElementById("progressPct").textContent = 100;
+  document.getElementById("barFill").style.width = "100%";
+  document.getElementById("stepNow").textContent = totalSteps;
+
+  const maxVisited = path.reduce((acc, item) => acc + item.max, 0);
+  const pct = maxVisited ? Math.round((totalScore / maxVisited) * 100) : 0;
+
+  let chipClass = "good";
+  let chipText = "Control alto";
+  let title = "Tu empresa sí tiene bastante control sobre sus activos digitales.";
+  let text = "No parece que estés operando solo con esperanza y buena memoria. Tienes una base bastante sólida para no depender de terceros en lo más crítico.";
+
+  if(pct < 80 && pct >= 60){
+    chipClass = "warn";
+    chipText = "Control parcial";
+    title = "Tienes control… pero todavía con zonas medio prestadas.";
+    text = "Hay cosas importantes bajo tu control, sí. Pero todavía existen accesos o activos que dependen demasiado de terceros. Operas bien, hasta que alguien no responde.";
+  } else if(pct < 60 && pct >= 40){
+    chipClass = "warn";
+    chipText = "Riesgo alto";
+    title = "Tu estructura digital está más frágil de lo que parece.";
+    text = "Aquí ya hay dependencia real de terceros o demasiadas dudas sobre quién controla qué. No es caos total, pero sí un escenario donde perder acceso sería bastante fácil.";
+  } else if(pct < 40){
+    chipClass = "bad";
+    chipText = "Peligro crítico";
+    title = "Tus activos digitales están corriendo más riesgo del que deberían.";
+    text = "Hoy tu empresa depende demasiado de accesos dispersos, terceros o vacíos de control. No es dramatismo: si algo pasa, recuperar todo puede ser lento, caro o simplemente imposible.";
+  }
+
+  const chip = document.getElementById("riskChip");
+  chip.className = "risk-chip " + chipClass;
+  chip.textContent = chipText;
+  document.getElementById("score").textContent = pct + "%";
+  document.getElementById("resultTitle").textContent = title;
+  document.getElementById("resultText").textContent = text;
+
+  const findings = [];
+  const answers = path.map(p => p.answer.toLowerCase());
+
+  if(answers.some(a => a === "no" || a.includes("no"))){
+    findings.push("<div class='finding'><strong>Hay activos fuera de tu control directo.</strong> Eso sí aumenta el riesgo operativo.</div>");
+  }
+  if(answers.some(a => a.includes("no estoy seguro")) || answers.some(a => a.includes("tal vez"))){
+    findings.push("<div class='finding'><strong>Hay demasiada incertidumbre.</strong> Cuando tu empresa no sabe quién controla qué, ya existe vulnerabilidad.</div>");
+  }
+  if(answers.some(a => a.includes("parcial")) || answers.some(a => a.includes("a medias")) || answers.some(a => a.includes("solo uno"))){
+    findings.push("<div class='finding'><strong>Tienes accesos incompletos.</strong> Ver algo no es lo mismo que administrarlo.</div>");
+  }
+  if(answers.filter(a => a.includes("sí")).length >= 4){
+    findings.push("<div class='finding'><strong>Tienes una base rescatable.</strong> Hay piezas importantes que sí parecen estar bien controladas.</div>");
+  }
+  if(findings.length === 0){
+    findings.push("<div class='finding'><strong>No salió una alerta dominante.</strong> Igual conviene revisar la estructura completa.</div>");
+  }
+
+  document.getElementById("findings").innerHTML = findings.slice(0,4).join("");
+}
+
+renderQuestion("q1");
+</script>
+</body>
+</html>
