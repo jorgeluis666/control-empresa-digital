@@ -41,39 +41,6 @@
     flex-direction:column;
   }
 
-  .topbar{
-    height:64px;
-    border-bottom:1px solid var(--line);
-    background:rgba(255,255,255,.92);
-    backdrop-filter:blur(10px);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 20px;
-    flex-shrink:0;
-  }
-  .brand{
-    font-size:14px;
-    font-weight:800;
-    letter-spacing:-.01em;
-  }
-  .brand span{color:var(--text2);font-weight:700}
-  .topmeta{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    color:var(--text2);
-    font-size:12px;
-    font-weight:700;
-  }
-  .step-pill{
-    background:#EFF6FF;
-    color:#1D4ED8;
-    border:1px solid #BFDBFE;
-    border-radius:999px;
-    padding:7px 11px;
-  }
-
   .main{
     flex:1;
     width:100%;
@@ -83,7 +50,7 @@
     grid-template-columns:minmax(0,1fr) 380px;
     gap:34px;
     min-height:0;
-    height:calc(100vh - 64px);
+    height:100vh;
     padding:0 24px;
   }
 
@@ -188,7 +155,7 @@
     padding:26px 24px;
     box-shadow:0 10px 30px rgba(15,23,42,.05);
     overflow:auto;
-    max-height:calc(100vh - 120px);
+    max-height:calc(100vh - 60px);
   }
 
   .q-tag{
@@ -417,29 +384,11 @@
     .q-title,.result h2{
       font-size:clamp(24px,7vw,30px);
     }
-    .topbar{
-      height:58px;
-      padding:0 14px;
-    }
-    .brand{
-      font-size:13px;
-    }
-    .step-pill{
-      font-size:11px;
-      padding:6px 9px;
-    }
   }
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="topbar">
-    <div class="brand">Lima Retail <span>· Test de control digital</span></div>
-    <div class="topmeta">
-      <div class="step-pill">Pregunta <span id="stepNow">1</span> / <span id="stepTotal">7</span></div>
-    </div>
-  </div>
-
   <div class="main">
     <section class="left">
       <div class="copy">
@@ -503,111 +452,111 @@ const questions = {
   q1: {
     tag: "Infraestructura",
     title: "¿Tienes acceso a tu hosting?",
-    sub: "Sí, al lugar donde vive tu web. No al amigo que dice que él lo ve.",
+    sub: "El hosting es donde se guarda tu sitio web. Tener acceso significa contar con usuario y clave para administrarlo directamente.",
     options: [
-      {label:"Sí, acceso total", sub:"Usuario, clave y control directo.", score:15, next:"q2a"},
-      {label:"Más o menos", sub:"Tengo algo, pero no mando del todo.", score:7, next:"q2b"},
-      {label:"No", sub:"Eso lo tiene otra persona.", score:0, next:"q2b"}
+      {label:"Sí, acceso total", sub:"Tengo usuario, clave y permisos completos.", score:15, next:"q2a"},
+      {label:"Más o menos", sub:"Puedo entrar, pero sin permisos completos.", score:7, next:"q2b"},
+      {label:"No", sub:"Lo administra mi proveedor o un tercero.", score:0, next:"q2b"}
     ]
   },
   q2a: {
     tag: "Propiedad",
-    title: "Bien. ¿Y el dominio también lo controlas tú?",
-    sub: "Porque tener la web sin controlar el dominio es como tener el local… alquilado por alguien más.",
+    title: "¿Y el dominio también está bajo tu control?",
+    sub: "El dominio es la dirección de tu web (por ejemplo, tuempresa.com). Si está registrado a nombre de otra persona, dependes de ella para cualquier cambio.",
     options: [
-      {label:"Sí, también", sub:"Todo bajo control.", score:15, next:"q3a"},
-      {label:"No estoy seguro", sub:"Ya empezamos con la fe.", score:4, next:"q3b"},
-      {label:"No", sub:"El dominio vive en otro universo.", score:0, next:"q3b"}
+      {label:"Sí, también", sub:"Está registrado a mi nombre o el de mi empresa.", score:15, next:"q3a"},
+      {label:"No estoy seguro", sub:"No sé en qué cuenta o proveedor está.", score:4, next:"q3b"},
+      {label:"No", sub:"Lo registró y lo gestiona alguien más.", score:0, next:"q3b"}
     ]
   },
   q2b: {
     tag: "Propiedad",
-    title: "Ok. Entonces vayamos a lo siguiente: ¿controlas tu dominio?",
-    sub: "Si tampoco controlas esto, la web está jugando de visita.",
+    title: "¿Tu dominio está bajo tu control?",
+    sub: "El dominio es la dirección de tu web (por ejemplo, tuempresa.com). Sin control sobre él, no puedes mover ni renovar tu sitio por tu cuenta.",
     options: [
-      {label:"Sí", sub:"Al menos esto sí.", score:10, next:"q3b"},
-      {label:"No estoy seguro", sub:"Modo intuición activado.", score:3, next:"q3b"},
-      {label:"No", sub:"Todo muy espiritual hasta ahora.", score:0, next:"q3b"}
+      {label:"Sí", sub:"Está registrado a mi nombre o el de mi empresa.", score:10, next:"q3b"},
+      {label:"No estoy seguro", sub:"No sé dónde está registrado actualmente.", score:3, next:"q3b"},
+      {label:"No", sub:"Lo registró y lo gestiona alguien más.", score:0, next:"q3b"}
     ]
   },
   q3a: {
     tag: "Meta",
-    title: "Pasemos a Meta. ¿Tienes acceso a tu Business Manager?",
-    sub: "El de verdad. No solo entrar a Facebook y mirar la página.",
+    title: "Pasemos a Meta: ¿tienes acceso a tu Business Manager?",
+    sub: "El Business Manager es la cuenta empresarial donde se centralizan tus páginas, anuncios y permisos en Facebook e Instagram.",
     options: [
-      {label:"Sí, administrador", sub:"Aquí sí hay orden.", score:15, next:"q4a"},
-      {label:"Tengo acceso parcial", sub:"Entro, pero no gobierno.", score:7, next:"q4b"},
-      {label:"No", sub:"Otro clásico.", score:0, next:"q4b"}
+      {label:"Sí, administrador", sub:"Tengo permisos para gestionar todo.", score:15, next:"q4a"},
+      {label:"Tengo acceso parcial", sub:"Puedo entrar pero no administrar todo.", score:7, next:"q4b"},
+      {label:"No", sub:"No tengo acceso al Business Manager.", score:0, next:"q4b"}
     ]
   },
   q3b: {
     tag: "Meta",
-    title: "Ahora Meta: ¿tienes acceso a tu Business Manager?",
-    sub: "Porque muchas empresas creen que sí… hasta que quieren tocar algo serio.",
+    title: "Pasemos a Meta: ¿tienes acceso a tu Business Manager?",
+    sub: "El Business Manager es la cuenta empresarial de Meta. Sin acceso, no puedes administrar tus páginas ni tu publicidad en Facebook e Instagram.",
     options: [
-      {label:"Sí, administrador", sub:"Perfecto.", score:15, next:"q4b"},
-      {label:"Tengo acceso parcial", sub:"Se puede mirar, poco más.", score:7, next:"q4b"},
-      {label:"No", sub:"Eso está peligroso.", score:0, next:"q4b"}
+      {label:"Sí, administrador", sub:"Tengo permisos para gestionar todo.", score:15, next:"q4b"},
+      {label:"Tengo acceso parcial", sub:"Puedo ver pero no modificar lo importante.", score:7, next:"q4b"},
+      {label:"No", sub:"Lo gestiona un proveedor o un tercero.", score:0, next:"q4b"}
     ]
   },
   q4a: {
     tag: "Google",
-    title: "¿Y en Google? ¿Controlas Google Ads y Analytics?",
-    sub: "No preguntamos por cariño. Preguntamos por control real.",
+    title: "Ahora Google: ¿controlas Google Ads y Analytics?",
+    sub: "Google Ads gestiona tus campañas de pago en Google. Analytics mide quién entra a tu web y cómo se comporta.",
     options: [
-      {label:"Sí, ambos", sub:"Muy bien.", score:20, next:"q5a"},
-      {label:"Solo uno", sub:"Algo es algo.", score:10, next:"q5b"},
-      {label:"No", sub:"La data anda suelta.", score:0, next:"q5b"}
+      {label:"Sí, ambos", sub:"Tengo acceso administrador a las dos cuentas.", score:20, next:"q5a"},
+      {label:"Solo uno", sub:"Tengo acceso a una pero no a la otra.", score:10, next:"q5b"},
+      {label:"No", sub:"No tengo acceso directo a ninguna.", score:0, next:"q5b"}
     ]
   },
   q4b: {
     tag: "Google",
-    title: "Vamos a Google: ¿tienes acceso a Ads y Analytics?",
-    sub: "Si no controlas medición ni campañas, operas con demasiada confianza.",
+    title: "Ahora Google: ¿tienes acceso a Google Ads y Analytics?",
+    sub: "Sin acceso a Ads y Analytics no puedes saber cuánto inviertes ni qué resultados están generando tus campañas.",
     options: [
-      {label:"Sí, ambos", sub:"Eso suma bastante.", score:20, next:"q5b"},
-      {label:"Solo uno", sub:"Todavía falta.", score:10, next:"q5b"},
-      {label:"No", sub:"Ajá.", score:0, next:"q5b"}
+      {label:"Sí, ambos", sub:"Tengo acceso administrador a las dos cuentas.", score:20, next:"q5b"},
+      {label:"Solo uno", sub:"Tengo acceso a una pero no a la otra.", score:10, next:"q5b"},
+      {label:"No", sub:"No tengo acceso directo a ninguna.", score:0, next:"q5b"}
     ]
   },
   q5a: {
     tag: "Continuidad",
-    title: "Última capa: si hoy tu proveedor desaparece, ¿puedes recuperar todo?",
-    sub: "Web, campañas, medición, cuentas, accesos. Todo.",
+    title: "Si hoy tu proveedor dejara de responder, ¿puedes recuperar todo?",
+    sub: "Pensemos en un escenario sin tu proveedor actual: web, campañas, medición, cuentas y accesos. ¿Tienes manera de recuperarlo todo por tu cuenta?",
     options: [
-      {label:"Sí, sin problema", sub:"Aquí sí hay empresa.", score:20, next:"q6"},
-      {label:"Tal vez", sub:"Esa palabra no da paz.", score:8, next:"q6"},
-      {label:"No", sub:"Ahí está el riesgo.", score:0, next:"q6"}
+      {label:"Sí, sin problema", sub:"Tengo respaldos y accesos directos a todo.", score:20, next:"q6"},
+      {label:"Tal vez", sub:"Algunas cosas sí, otras dependerían de él.", score:8, next:"q6"},
+      {label:"No", sub:"Sin mi proveedor no podría recuperar la información.", score:0, next:"q6"}
     ]
   },
   q5b: {
     tag: "Continuidad",
-    title: "Pregunta incómoda: si hoy tu proveedor desaparece, ¿puedes recuperar tus activos?",
-    sub: "Sí, ya sé. No suena bonito. Pero justo por eso se pregunta.",
+    title: "Si hoy tu proveedor dejara de responder, ¿puedes recuperar tus activos?",
+    sub: "Pensemos en el peor escenario: tu proveedor deja de estar disponible. ¿Tienes forma de recuperar tus cuentas, datos y campañas?",
     options: [
-      {label:"Sí, sin problema", sub:"Todavía hay esperanza.", score:20, next:"q6"},
-      {label:"Tal vez", sub:"Dependes más de lo que crees.", score:8, next:"q6"},
-      {label:"No", sub:"Entonces no tienes control real.", score:0, next:"q6"}
+      {label:"Sí, sin problema", sub:"Tengo respaldos y accesos directos a todo.", score:20, next:"q6"},
+      {label:"Tal vez", sub:"Algunas cosas sí, otras dependerían de él.", score:8, next:"q6"},
+      {label:"No", sub:"Sin mi proveedor no podría recuperar la información.", score:0, next:"q6"}
     ]
   },
   q6: {
     tag: "Orden interno",
     title: "¿Más de una persona de confianza tiene acceso administrativo?",
-    sub: "Porque ponerle todo el negocio a una sola persona no es estructura. Es fe.",
+    sub: "Tener un segundo administrador evita perder el acceso si la persona principal renuncia, se enferma o comete un error.",
     options: [
-      {label:"Sí", sub:"Buen respaldo.", score:10, next:"q7"},
-      {label:"Solo una", sub:"Muy frágil.", score:4, next:"q7"},
-      {label:"No sé", sub:"Otra vez la niebla.", score:0, next:"q7"}
+      {label:"Sí", sub:"Hay al menos dos personas con acceso completo.", score:10, next:"q7"},
+      {label:"Solo una", sub:"Una sola persona maneja los accesos.", score:4, next:"q7"},
+      {label:"No sé", sub:"No tengo certeza de quién tiene qué accesos.", score:0, next:"q7"}
     ]
   },
   q7: {
     tag: "Cierre",
     title: "¿Tienes documentado quién controla qué?",
-    sub: "Usuarios, permisos, plataformas y responsables. Nada glamoroso, pero útil cuando hay problemas.",
+    sub: "Una lista clara de usuarios, permisos, plataformas y responsables ayuda a actuar rápido cuando algo falla.",
     options: [
-      {label:"Sí, ordenado", sub:"Esto sí es empresa.", score:15, next:null},
-      {label:"A medias", sub:"Algo hay.", score:6, next:null},
-      {label:"No", sub:"Todo vive en chats y recuerdos.", score:0, next:null}
+      {label:"Sí, ordenado", sub:"Tenemos un documento o tabla actualizada.", score:15, next:null},
+      {label:"A medias", sub:"Hay registros parciales en distintos lugares.", score:6, next:null},
+      {label:"No", sub:"La información está en correos, chats o memoria.", score:0, next:null}
     ]
   }
 };
@@ -619,8 +568,6 @@ const totalSteps = 7;
 function updateProgress() {
   const answered = path.length;
   const pct = Math.round((answered / totalSteps) * 100);
-  document.getElementById("stepNow").textContent = Math.min(answered + 1, totalSteps);
-  document.getElementById("stepTotal").textContent = totalSteps;
   document.getElementById("progressPct").textContent = pct;
   document.getElementById("barFill").style.width = pct + "%";
 }
@@ -664,7 +611,6 @@ function showResult(){
   document.getElementById("resultView").classList.add("show");
   document.getElementById("progressPct").textContent = 100;
   document.getElementById("barFill").style.width = "100%";
-  document.getElementById("stepNow").textContent = totalSteps;
 
   const maxVisited = path.reduce((acc, item) => acc + item.max, 0);
   const pct = maxVisited ? Math.round((totalScore / maxVisited) * 100) : 0;
