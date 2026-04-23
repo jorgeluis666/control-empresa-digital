@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Test de Control Digital · Fullscreen Split</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=Poppins:wght@300;600&family=Open+Sans:wght@700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#F6F8FB;
@@ -328,6 +331,61 @@
     white-space:nowrap;
   }
 
+  .share-block{
+    width:100%;
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px dashed var(--line);
+  }
+  .share-label{
+    font-size:12px;
+    font-weight:800;
+    color:var(--text2);
+    margin-bottom:10px;
+    letter-spacing:.02em;
+  }
+  .share-buttons{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .share-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--text);
+    border-radius:14px;
+    padding:12px 15px;
+    font-size:13px;
+    font-weight:900;
+    cursor:pointer;
+    font-family:inherit;
+    transition:.15s ease;
+  }
+  .share-btn:hover{
+    background:linear-gradient(#FFF8F7,#FFF8F7) padding-box,var(--red-gradient) border-box;
+    border-color:transparent;
+    transform:translateY(-1px);
+  }
+  .share-btn[disabled]{
+    opacity:.6;
+    cursor:wait;
+  }
+  .share-preview{
+    margin-top:10px;
+    width:100%;
+    aspect-ratio:9/16;
+    background:#F1F5F9;
+    border-radius:14px;
+    overflow:hidden;
+    display:none;
+  }
+  .share-preview.show{display:block}
+  .share-preview img{width:100%;height:100%;object-fit:contain;display:block}
+
   @media(max-width:900px){
     body{overflow:auto}
     .app{height:auto;min-height:100vh}
@@ -424,6 +482,15 @@
                href="https://wa.me/51937409733?text=Hola%2C%20quiero%20ayuda%20para%20centralizar%20mis%20cuentas%20y%20ordenar%20mis%20activos%20digitales.">
               Hablar por WhatsApp
             </a>
+
+            <div class="share-block">
+              <div class="share-label">Comparte tu resultado</div>
+              <div class="share-buttons">
+                <button class="share-btn" id="btnShare" type="button">Compartir en tu Story</button>
+                <button class="share-btn" id="btnDownload" type="button">Descargar imagen (1080×1920)</button>
+              </div>
+              <div class="share-preview" id="sharePreview"><img id="sharePreviewImg" alt="Vista previa del Story" /></div>
+            </div>
           </div>
         </div>
       </div>
@@ -651,6 +718,233 @@ function showResult(){
   }
 
   document.getElementById("findings").innerHTML = findings.slice(0,4).join("");
+
+  wireShareButtons();
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  const radius = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + w - radius, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+  ctx.lineTo(x + w, y + h - radius);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+  ctx.lineTo(x + radius, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+function wrapLines(ctx, text, maxWidth, maxLines){
+  const words = text.split(/\s+/);
+  const lines = [];
+  let current = "";
+  for(const w of words){
+    const test = current ? current + " " + w : w;
+    if(ctx.measureText(test).width > maxWidth && current){
+      lines.push(current);
+      current = w;
+      if(lines.length === maxLines - 1) break;
+    } else {
+      current = test;
+    }
+  }
+  if(current && lines.length < maxLines) lines.push(current);
+  if(lines.length === maxLines){
+    let last = lines[maxLines - 1];
+    while(ctx.measureText(last + "…").width > maxWidth && last.length > 0){
+      last = last.slice(0, -1);
+    }
+    lines[maxLines - 1] = last.trim() + (words.length > lines.join(" ").split(/\s+/).length ? "…" : "");
+  }
+  return lines;
+}
+
+async function renderStoryCanvas(){
+  if(document.fonts && document.fonts.ready){
+    try { await document.fonts.ready; } catch(e){}
+  }
+
+  const W = 1080, H = 1920;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0,    "#FF5A3D");
+  grad.addColorStop(0.55, "#FF3F5F");
+  grad.addColorStop(1,    "#FF1F49");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  const pct = parseInt(document.getElementById("score").textContent, 10) || 0;
+  const chipEl = document.getElementById("riskChip");
+  const chipText = chipEl.textContent.trim();
+  const chipClass = chipEl.classList.contains("good") ? "good"
+                  : chipEl.classList.contains("bad")  ? "bad"
+                  : "warn";
+  const titleText = document.getElementById("resultTitle").textContent.trim();
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  ctx.font = '800 28px "Montserrat", sans-serif';
+  ctx.fillText("AGENCIA LIMA RETAIL", W/2, 110);
+
+  ctx.fillStyle = "rgba(255,255,255,0.78)";
+  ctx.font = '400 26.6px "Poppins", sans-serif';
+  ctx.fillText("Test de Control Digital", W/2, 154);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.22)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(140, 210);
+  ctx.lineTo(W - 140, 210);
+  ctx.stroke();
+
+  const chipColors = {
+    good: { bg: "#FFFFFF", text: "#059669", label: "CONTROL ALTO" },
+    warn: { bg: "#FFFFFF", text: "#B45309", label: chipText.toUpperCase() },
+    bad:  { bg: "#FFFFFF", text: "#B91C1C", label: "PELIGRO CRÍTICO" }
+  };
+  const c = chipColors[chipClass];
+  const chipLabel = (chipClass === "warn") ? chipText.toUpperCase() : c.label;
+
+  ctx.font = '800 38px "Montserrat", sans-serif';
+  const chipTextW = ctx.measureText(chipLabel).width;
+  const chipPad = 46;
+  const chipH = 96;
+  const chipW = chipTextW + chipPad * 2;
+  const chipX = (W - chipW) / 2;
+  const chipY = 300;
+
+  ctx.fillStyle = c.bg;
+  roundRect(ctx, chipX, chipY, chipW, chipH, chipH/2);
+  ctx.fill();
+
+  ctx.fillStyle = c.text;
+  ctx.textBaseline = "middle";
+  ctx.fillText(chipLabel, W/2, chipY + chipH/2 + 2);
+
+  ctx.textBaseline = "top";
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = '900 280px "Montserrat", sans-serif';
+  ctx.fillText(pct + "%", W/2, 460);
+
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = '800 68px "Montserrat", sans-serif';
+  const lines = wrapLines(ctx, titleText, W - 200, 5);
+  const lineH = 82;
+  const titleStartY = 860;
+  lines.forEach((line, i) => {
+    ctx.fillText(line, W/2, titleStartY + i * lineH);
+  });
+
+  ctx.strokeStyle = "rgba(255,255,255,0.22)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(140, 1520);
+  ctx.lineTo(W - 140, 1520);
+  ctx.stroke();
+
+  ctx.fillStyle = "rgba(255,255,255,0.88)";
+  ctx.font = '800 28px "Montserrat", sans-serif';
+  ctx.fillText("HAZ EL TEST TÚ TAMBIÉN", W/2, 1580);
+
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = '300 44px "Poppins", sans-serif';
+  ctx.fillText("www.limaretail.com", W/2, 1628);
+
+  const btnW = 460, btnH = 108, btnR = 22;
+  const btnX = (W - btnW)/2, btnY = 1720;
+  ctx.fillStyle = "#518fec";
+  roundRect(ctx, btnX, btnY, btnW, btnH, btnR);
+  ctx.fill();
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = '700 36px "Open Sans", sans-serif';
+  ctx.textBaseline = "middle";
+  ctx.fillText("HACER EL TEST  →", W/2, btnY + btnH/2 + 2);
+
+  return canvas;
+}
+
+function canvasToBlob(canvas){
+  return new Promise(resolve => canvas.toBlob(resolve, "image/png", 0.95));
+}
+
+let cachedStoryBlob = null;
+let cachedStoryUrl  = null;
+
+async function buildAndPreview(){
+  const canvas = await renderStoryCanvas();
+  const blob = await canvasToBlob(canvas);
+  cachedStoryBlob = blob;
+  if(cachedStoryUrl) URL.revokeObjectURL(cachedStoryUrl);
+  cachedStoryUrl = URL.createObjectURL(blob);
+  const previewEl = document.getElementById("sharePreview");
+  const imgEl = document.getElementById("sharePreviewImg");
+  imgEl.src = cachedStoryUrl;
+  previewEl.classList.add("show");
+  return blob;
+}
+
+async function handleDownload(){
+  const btn = document.getElementById("btnDownload");
+  btn.disabled = true; btn.textContent = "Generando imagen…";
+  try {
+    const blob = cachedStoryBlob || await buildAndPreview();
+    const pct = parseInt(document.getElementById("score").textContent, 10) || 0;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "lima-retail-test-control-" + pct + ".png";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  } catch(e){
+    alert("No se pudo generar la imagen: " + (e && e.message ? e.message : e));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Descargar imagen (1080×1920)";
+  }
+}
+
+async function handleShare(){
+  const btn = document.getElementById("btnShare");
+  btn.disabled = true; btn.textContent = "Preparando…";
+  try {
+    const blob = cachedStoryBlob || await buildAndPreview();
+    const pct = parseInt(document.getElementById("score").textContent, 10) || 0;
+    const chipText = document.getElementById("riskChip").textContent.trim();
+    const file = new File([blob], "lima-retail-test-control-" + pct + ".png", { type: "image/png" });
+    const shareData = {
+      files: [file],
+      title: "Test de Control Digital · Lima Retail",
+      text: "Mi resultado: " + chipText + " (" + pct + "%). Haz el test: www.limaretail.com"
+    };
+    if(navigator.canShare && navigator.canShare(shareData)){
+      await navigator.share(shareData);
+    } else {
+      alert("Tu navegador no soporta compartir directo a Stories. Se va a descargar la imagen — súbela manualmente a tu Story.");
+      await handleDownload();
+    }
+  } catch(e){
+    if(e && e.name === "AbortError") return;
+    alert("No se pudo compartir: " + (e && e.message ? e.message : e));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Compartir en tu Story";
+  }
+}
+
+function wireShareButtons(){
+  const dl = document.getElementById("btnDownload");
+  const sh = document.getElementById("btnShare");
+  if(dl && !dl.dataset.wired){ dl.addEventListener("click", handleDownload); dl.dataset.wired = "1"; }
+  if(sh && !sh.dataset.wired){ sh.addEventListener("click", handleShare);    sh.dataset.wired = "1"; }
+  buildAndPreview().catch(() => {});
 }
 
 renderQuestion("q1");
