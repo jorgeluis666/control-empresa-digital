@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Test de Control Digital · Fullscreen Split</title>
+<title>Test de Control Digital · Lima Retail</title>
+<meta name="description" content="Diagnóstico rápido: descubre qué tanto control tienes sobre tu empresa en digital. Hosting, dominio, Meta, Google y más." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Poppins:wght@300;400&family=Open+Sans:wght@700&display=swap" rel="stylesheet">
@@ -184,7 +185,7 @@
     border:1px solid transparent;
     background:linear-gradient(#fff,#fff) padding-box,linear-gradient(var(--line),var(--line)) border-box;
     border-radius:18px;
-    padding:15px 15px;
+    padding:15px;
     text-align:left;
     cursor:pointer;
     transition:.15s ease;
@@ -915,17 +916,19 @@ let slideBlobs = [null,null,null,null];
 let slideUrls  = [null,null,null,null];
 let currentSlide = 0;
 
-async function renderSlideCanvas(type){
+function renderSlideCanvas(type){
   const W = 1080, H = 1920;
   const canvas = document.createElement("canvas");
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext("2d");
   drawBackground(ctx, W, H);
   drawHeader(ctx, W);
-  if(type === 'score')     drawSlideScore(ctx, W, H, resultData);
-  if(type === 'diagnosis') drawSlideDiagnosis(ctx, W, H, resultData);
-  if(type === 'findings')  drawSlideFindings(ctx, W, H, resultData);
-  if(type === 'cta')       drawSlideCTA(ctx, W, H, resultData);
+  switch(type){
+    case 'score':     drawSlideScore(ctx, W, H, resultData);     break;
+    case 'diagnosis': drawSlideDiagnosis(ctx, W, H, resultData); break;
+    case 'findings':  drawSlideFindings(ctx, W, H, resultData);  break;
+    case 'cta':       drawSlideCTA(ctx, W, H);                   break;
+  }
   drawFooter(ctx, W);
   return canvas;
 }
@@ -935,12 +938,10 @@ function canvasToBlob(canvas){
 }
 
 async function renderAllSlides(){
-  if(document.fonts && document.fonts.ready){
-    try { await document.fonts.ready; } catch(e){}
-  }
-  for(let i = 0; i < SLIDE_TYPES.length; i++){
+  try { await document.fonts?.ready; } catch(e){}
+  await Promise.all(SLIDE_TYPES.map(async (type, i) => {
     try {
-      const canvas = await renderSlideCanvas(SLIDE_TYPES[i]);
+      const canvas = renderSlideCanvas(type);
       const blob = await canvasToBlob(canvas);
       slideBlobs[i] = blob;
       if(slideUrls[i]) URL.revokeObjectURL(slideUrls[i]);
@@ -952,7 +953,7 @@ async function renderAllSlides(){
     } catch(e){
       console.error("slide render error", i, e);
     }
-  }
+  }));
 }
 
 function mountSlider(){
